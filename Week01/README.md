@@ -36,7 +36,7 @@
 
    3. *在线运行时：**k8s，**以及一系列* *Prometheus**、**ELK**、**Conrtol Panle*
 
-      ![image-20201127202913431](/Users/bishop/Library/Application Support/typora-user-images/image-20201127202913431.png)
+      ![image-20201127202913431](../img/image-20201127202913431.png)
 
    4. 服务发现
 
