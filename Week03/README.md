@@ -116,6 +116,11 @@
 - go标准网络库可被托管，~~吊打其它语言业务、中间件，~~不会因为超时导致oom。[kratos案例][9]
 - 当一个context被cancel时，所有子context都会被cancel
 - 一定要cancel 否者context会泄漏
+
+### HomeWork
+1. 基于 errgroup 实现一个 http server 的启动和关闭 ，以及 linux signal 信号的注册和处理，要保证能够一个退出，全部注销退出。
+
+
 ### **Final Notes**
 - Incoming requests to a server should create a Context.
 - Outgoing calls to servers should accept a Context.
