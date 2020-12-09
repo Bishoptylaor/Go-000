@@ -113,14 +113,16 @@ func main(){
 	eg.Go(func() error {
 		s := make(chan os.Signal)
 		signal.Notify(s, os.Interrupt)
-		select {
-		case <-ctx.Done():
-			fmt.Println("signal ctx has done")
-			return ctx.Err()
-		case sgi := <-s:
-			fmt.Println("receiving signal")
-			cancel()
-			return fmt.Errorf("handling err:%s", sgi)
+		for{
+			select {
+			case <-ctx.Done():
+				fmt.Println("signal ctx has done")
+				return ctx.Err()
+			case sgi := <-s:
+				fmt.Println("receiving signal")
+				cancel()
+				return fmt.Errorf("handling err:%s", sgi)
+			}
 		}
 	})
 	log.Printf("This pid is %d", syscall.Getpid())
