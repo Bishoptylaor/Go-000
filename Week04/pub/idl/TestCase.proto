@@ -1,0 +1,536 @@
+syntax = "proto3";
+
+import "GrpcUtil.proto";
+
+package marketcomponent;
+
+message EchoReq {
+    int32 id = 1;
+}
+
+message EchoData {
+    int32 id = 1;
+}
+
+message EchoRes {
+    util.grpcutil.ErrInfo errinfo = 1;
+    EchoData data = 2;
+}
+
+// 修复接口
+message HotFixReq {
+    string handler = 1;
+}
+
+message HotFixData {
+    string payload = 1;
+}
+
+message HotFixRes {
+    util.grpcutil.ErrInfo errinfo = 1;
+    HotFixData data = 2;
+}
+
+enum CheckInCycle {
+    NoCIC = 0;
+    Day = 1;
+    Week = 2;
+    Month = 3;
+}
+
+enum CheckInTypes {
+    NoCIT = 0;
+    Loosen = 1;
+    Strict = 2;
+}
+
+enum GatherOperation {
+    NoGO = 0;
+    Add = 1;
+    Minus = 2;
+}
+
+// 获取操作记录
+message GetOperationLogReq {
+    int64 rowid = 1;
+    string tkey = 2;
+    int32 offset = 3;
+    int32 limit = 4;
+}
+
+message GetOperationLogData {
+    int32 offset = 2;
+    bool more = 3;
+    int32 total = 4;
+}
+
+message GetOperationLogRes {
+    util.grpcutil.ErrInfo errinfo = 1;
+    GetOperationLogData data = 2;
+}
+
+message CheckinLog {
+    int64 id = 1;
+    int64 ct = 2;
+    int64 ut = 3;
+    int64 startstamp = 4;
+    int64 endstamp = 5;
+    int64 config_id = 6;
+    int64 uid = 7;
+    int64 eventid = 8;
+    int64 lastid = 9;
+    int32 status = 10;
+    int32 consecutive_count = 11;
+}
+
+message CheckinSendLog {
+    int64 id = 1;
+    int64 ct = 2;
+    int64 ut = 3;
+    int64 uid = 4;
+    int64 configid = 5;
+    int64 logid = 6;
+    int64 giftid = 7;
+    int32 status = 8;
+    string logs = 9;
+}
+
+/*------ 签到配置 start ------*/
+message CheckinConfig {
+    int64 id = 1;
+    int64 ct = 2;
+    int64 ut = 3;
+    int32 status = 4;
+    int64 st = 5;
+    int64 et = 6;
+    CheckInCycle cycle = 7; // 周期类型
+    CheckInTypes types = 8;
+    bool manual = 9;
+    int64 eventid = 10;
+    int64 giftid = 11;
+    string checkin_key = 12; // 对外唯一标识
+    string name = 13;
+    string fresh_at = 14;
+    int32 fresh_type = 15; // 刷新类型
+    int32 checkin_cycle_length = 16; // 周期长度
+}
+// 签到新增
+message AddCheckinConfigReq {
+    CheckinConfig item = 1;
+    string opaccount = 2;
+}
+message AddCheckinConfigData {
+    CheckinConfig item = 1;
+}
+message AddCheckinConfigRes {
+    util.grpcutil.ErrInfo errinfo = 1;
+    AddCheckinConfigData data = 2;
+}
+// 签到更新
+message UpdateCheckinConfigReq {
+    CheckinConfig item = 1;
+    string opaccount = 2;
+}
+message UpdateCheckinConfigData {
+    bool ok = 1;
+}
+message UpdateCheckinConfigRes {
+    util.grpcutil.ErrInfo errinfo = 1;
+    UpdateCheckinConfigData data = 2;
+}
+// 签到删除
+message DelCheckinConfigReq {
+    int64 id = 1;
+    string opaccount = 2;
+}
+message DelCheckinConfigData {
+    bool ok = 1;
+}
+message DelCheckinConfigRes {
+    util.grpcutil.ErrInfo errinfo = 1;
+    DelCheckinConfigData data = 2;
+}
+// 签到一键启用禁用
+message EnableCheckinConfigReq {
+    int64 id = 1;
+    string opaccount = 2;
+    bool enable = 3;
+}
+message EnableCheckinConfigData {
+    bool ok = 1;
+}
+message EnableCheckinConfigRes {
+    util.grpcutil.ErrInfo errinfo = 1;
+    EnableCheckinConfigData data = 2;
+}
+// 签到查单个
+message GetCheckinConfigReq {
+    int64 id = 1;
+    string checkin_key = 2;
+}
+message GetCheckinConfigData {
+    CheckinConfig item = 1;
+}
+message GetCheckinConfigRes {
+    util.grpcutil.ErrInfo errinfo = 1;
+    GetCheckinConfigData data = 2;
+}
+// 签到查列表
+message ListCheckinConfigReq {
+    int32 offset = 1;
+    int32 limit = 2;
+}
+message ListCheckinConfigData {
+    repeated CheckinConfig items = 1;
+    int32 offset = 2;
+    int32 total = 3;
+    bool more = 4;
+}
+message ListCheckinConfigRes {
+    util.grpcutil.ErrInfo errinfo = 1;
+    ListCheckinConfigData data = 2;
+}
+/*------ 签到配置 end ------*/
+
+message FreshInfo {
+    int32 fresh_type = 1;
+    string fresh_name = 2;
+    string extra = 3;
+}
+// 签到计数刷新配置信息
+message GetCheckinFreshInfoReq {
+}
+message GetCheckinFreshInfoData {
+    repeated FreshInfo items = 1;
+}
+message GetCheckinFreshInfoRes {
+    util.grpcutil.ErrInfo errinfo = 1;
+    GetCheckinFreshInfoData data = 2;
+}
+
+// 前端签到
+message FrontCheckinReq {
+    int64 uid = 1;
+    int64 eventid = 2;
+    string checkin_key = 3;
+}
+message FrontCheckinData {
+    bool ok = 1;
+}
+message FrontCheckinRes {
+    util.grpcutil.ErrInfo errinfo = 1;
+    FrontCheckinData data = 2;
+}
+// 签到
+message DoCheckinReq {
+    int64 uid = 1;
+    int64 eventid = 2;
+    string checkin_key = 3;
+    bool isfront = 4;
+}
+message DoCheckinData {
+    bool ok = 1;
+}
+message DoCheckinRes {
+    util.grpcutil.ErrInfo errinfo = 1;
+    DoCheckinData data = 2;
+}
+
+message RealTimeCheckinLog {
+    int64 startstamp = 1;
+    bool ischeckin = 2;
+}
+// 获取活动签到情况-按真实情况填充
+message GetCheckinLogByRealDayReq {
+    int64 uid = 1;
+    int64 eventid = 2;
+    string checkin_key = 3;
+}
+message GetCheckinLogByRealDayData {
+    repeated RealTimeCheckinLog items= 1;
+    int32 total = 2;
+}
+message GetCheckinLogByRealDayRes {
+    util.grpcutil.ErrInfo errinfo = 1;
+    GetCheckinLogByRealDayData data = 2;
+}
+
+// 获取活动当前连续签到天数
+message GetCheckinMaxDayReq {
+    int64 uid = 1;
+    int64 eventid = 2;
+    string checkin_key = 3;
+}
+message GetCheckinMaxDayData {
+    int32 consecutive_count = 1;
+}
+message GetCheckinMaxDayRes {
+    util.grpcutil.ErrInfo errinfo = 1;
+    GetCheckinMaxDayData data = 2;
+}
+
+// 当前key，当前时间所在区间签到情况
+message IsCurrentWindowCheckinReq {
+    int64 uid = 1;
+    int64 eventid = 2;
+    string checkin_key = 3;
+}
+message IsCurrentWindowCheckinData {
+    bool checkin = 1;
+}
+message IsCurrentWindowCheckinRes {
+    util.grpcutil.ErrInfo errinfo = 1;
+    IsCurrentWindowCheckinData data = 2;
+}
+
+// 获取当前计数周期内签到情况
+message GetThisRoundCheckInLogsReq {
+    int64 uid = 1;
+    int64 eventid = 2;
+    string checkin_key = 3;
+}
+message GetThisRoundCheckInLogsData {
+    repeated CheckinLog items = 1;
+    bool today_checkin = 2;
+}
+message GetThisRoundCheckInLogsRes {
+    util.grpcutil.ErrInfo errinfo = 1;
+    GetThisRoundCheckInLogsData data = 2;
+}
+
+/*------ 收集组件配置 start ------*/
+message GatherConfig {
+    int64 id = 1;
+    int64 ct = 2;
+    int64 ut = 3;
+    int32 status = 4;
+    int64 st = 5;
+    int64 et = 6;
+    string gather_key = 7;
+    int64 eventid = 8;
+    bool ranking = 9;
+    int64 up_limit = 10;
+}
+// 收集组件新增
+message AddGatherConfigReq {
+    GatherConfig item = 1;
+    string opaccount = 2;
+}
+message AddGatherConfigData {
+    GatherConfig item = 1;
+}
+message AddGatherConfigRes {
+    util.grpcutil.ErrInfo errinfo = 1;
+    AddGatherConfigData data = 2;
+}
+// 收集组件更新
+message UpdateGatherConfigReq {
+    GatherConfig item = 1;
+    string opaccount = 2;
+}
+message UpdateGatherConfigData {
+    bool ok = 1;
+}
+message UpdateGatherConfigRes {
+    util.grpcutil.ErrInfo errinfo = 1;
+    UpdateGatherConfigData data = 2;
+}
+// 收集组件删除
+message DelGatherConfigReq {
+    int64 id = 1;
+    string opaccount = 2;
+}
+message DelGatherConfigData {
+    bool ok = 1;
+}
+message DelGatherConfigRes {
+    util.grpcutil.ErrInfo errinfo = 1;
+    DelGatherConfigData data = 2;
+}
+// 收集组件一键启用禁用
+message EnableGatherConfigReq {
+    int64 id = 1;
+    string opaccount = 2;
+    bool enable = 3;
+}
+message EnableGatherConfigData {
+    bool ok = 1;
+}
+message EnableGatherConfigRes {
+    util.grpcutil.ErrInfo errinfo = 1;
+    EnableGatherConfigData data = 2;
+}
+// 收集组件查单个
+message GetGatherConfigReq {
+    int64 id = 1;
+    string gather_key = 2;
+}
+message GetGatherConfigData {
+    GatherConfig item = 1;
+}
+message GetGatherConfigRes {
+    util.grpcutil.ErrInfo errinfo = 1;
+    GetGatherConfigData data = 2;
+}
+// 收集组件查列表
+message ListGatherConfigReq {
+    int32 offset = 1;
+    int32 limit = 2;
+}
+message ListGatherConfigData {
+    repeated GatherConfig items = 1;
+    int32 offset = 2;
+    int32 total = 3;
+    bool more = 4;
+}
+message ListGatherConfigRes {
+    util.grpcutil.ErrInfo errinfo = 1;
+    ListGatherConfigData data = 2;
+}
+/*------ 收集组件配置 end ------*/
+
+message GatherLog {
+    int64 id = 1;// 自增id
+    int64 ct = 2;// 创建时间
+    int64 ut = 3; // 更新时间
+    int64 uid = 4;// uid
+    int64 eventid = 5;// eventid
+    string gather_key = 6;// 收集动作唯一标识
+    int64 gather_value = 7;// 改变的值
+    GatherOperation op = 8;// 动作类型：add/minus
+    string unique_tag = 9;// 变更动作唯一标识
+    string extra = 10;// 额外信息
+}
+
+message GatherInfo {
+    int64 id = 1;// 自增id
+    int64 ct = 2;// 创建时间
+    int64 ut = 3; // 更新时间
+    int64 uid = 4;// uid
+    int64 eventid = 5;// eventid
+    string gather_key = 6;// 收集动作唯一标识
+    int32 num = 7;// 当前数值
+}
+
+// 变更收集进度
+message ModifyGatherValueReq {
+    int64 uid = 1;
+    string gather_key = 2;
+    int64 gather_value = 3;
+    string u_log = 4;
+    GatherOperation op = 5;
+    string extra = 6;
+    int64 eventid = 7;
+}
+message ModifyGatherValueData {
+    bool ok = 1;
+}
+message ModifyGatherValueRes {
+    util.grpcutil.ErrInfo errinfo = 1;
+    ModifyGatherValueData data = 2;
+}
+
+// 获取当前进度
+message GetCurrentGatherInfoReq {
+    int64 uid = 1;
+    int64 eventid = 2;
+    string gather_key = 3;
+}
+message GetCurrentGatherInfoData {
+    int64 gather_value = 3;
+}
+message GetCurrentGatherInfoRes {
+    util.grpcutil.ErrInfo errinfo = 1;
+    GetCurrentGatherInfoData data = 2;
+}
+
+// 批量获取当前进度
+message BatchGetCurrentGatherInfoReq {
+    repeated int64 uids = 1;
+    int64 eventid = 2;
+    string gather_key = 3;
+}
+message BatchGetCurrentGatherInfoData {
+    repeated GatherInfo items = 1;
+}
+message BatchGetCurrentGatherInfoRes {
+    util.grpcutil.ErrInfo errinfo = 1;
+    BatchGetCurrentGatherInfoData data = 2;
+}
+
+// 获取今日收集记录
+message GetTodayGatherLogReq {
+    int64 uid = 1;
+    int64 eventid = 2;
+    string gather_key = 3;
+}
+message GetTodayGatherLogData {
+    repeated GatherLog items = 1;
+    int64 adds = 2; // 今日增加
+    int64 minus = 3; // 今日减少
+    int32 today_lc = 4; // 今日变更记录条目数
+}
+message GetTodayGatherLogRes {
+    util.grpcutil.ErrInfo errinfo = 1;
+    GetTodayGatherLogData data = 2;
+}
+
+
+service MarketComponentService {
+    rpc Echo(EchoReq) returns (EchoRes);
+    rpc HotFix(HotFixReq) returns (HotFixRes);
+
+    // 获取操作记录
+    rpc GetOperationLog(GetOperationLogReq) returns (GetOperationLogRes);
+
+    // 签到配置新增
+    rpc AddCheckinConfig(AddCheckinConfigReq) returns (AddCheckinConfigRes);
+    // 签到配置更新
+    rpc UpdateCheckinConfig(UpdateCheckinConfigReq) returns (UpdateCheckinConfigRes);
+    // 签到配置删除
+    rpc DelCheckinConfig(DelCheckinConfigReq) returns (DelCheckinConfigRes);
+    // 签到配置一键启用禁用
+    rpc EnableCheckinConfig(EnableCheckinConfigReq) returns (EnableCheckinConfigRes);
+    // 签到配置查单个
+    rpc GetCheckinConfig(GetCheckinConfigReq) returns (GetCheckinConfigRes);
+    // 签到配置查列表
+    rpc ListCheckinConfig(ListCheckinConfigReq) returns (ListCheckinConfigRes);
+    // 签到计数刷新配置信息
+    rpc GetCheckinFreshInfo(GetCheckinFreshInfoReq) returns (GetCheckinFreshInfoRes);
+
+    // 前端签到接口
+    rpc FrontCheckin(FrontCheckinReq) returns (FrontCheckinRes);
+    // 签到接口
+    rpc DoCheckin(DoCheckinReq) returns (DoCheckinRes);
+    // 获取活动签到情况-按真实情况填充
+    rpc GetCheckinLogByRealDay(GetCheckinLogByRealDayReq) returns (GetCheckinLogByRealDayRes);
+    // 获取活动当前天数
+    rpc GetCheckinMaxDay(GetCheckinMaxDayReq) returns (GetCheckinMaxDayRes);
+    // 当前key，当前时间所在区间签到情况
+    rpc IsCurrentWindowCheckin(IsCurrentWindowCheckinReq) returns (IsCurrentWindowCheckinRes);
+    // 获取当前计数周期内签到情况
+    rpc GetThisRoundCheckInLogs(GetThisRoundCheckInLogsReq) returns (GetThisRoundCheckInLogsRes);
+
+    // 收集配置新增
+    rpc AddGatherConfig(AddGatherConfigReq) returns (AddGatherConfigRes);
+    // 收集配置更新
+    rpc UpdateGatherConfig(UpdateGatherConfigReq) returns (UpdateGatherConfigRes);
+    // 收集配置删除
+    rpc DelGatherConfig(DelGatherConfigReq) returns (DelGatherConfigRes);
+    // 收集配置一键启用禁用
+    rpc EnableGatherConfig(EnableGatherConfigReq) returns (EnableGatherConfigRes);
+    // 收集配置查单个
+    rpc GetGatherConfig(GetGatherConfigReq) returns (GetGatherConfigRes);
+    // 收集配置查列表
+    rpc ListGatherConfig(ListGatherConfigReq) returns (ListGatherConfigRes);
+
+    // 收集进度变更
+    rpc ModifyGatherValue(ModifyGatherValueReq) returns (ModifyGatherValueRes);
+    // 获取当前进度
+    rpc GetCurrentGatherInfo(GetCurrentGatherInfoReq) returns (GetCurrentGatherInfoRes);
+    // 批量获取当前进度
+    rpc BatchGetCurrentGatherInfo(BatchGetCurrentGatherInfoReq) returns (BatchGetCurrentGatherInfoRes);
+    // 获取今日收集进度
+    rpc GetTodayGatherLog(GetTodayGatherLogReq) returns (GetTodayGatherLogRes);
+}
+
