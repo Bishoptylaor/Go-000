@@ -36,12 +36,12 @@ var writeLock sync.Mutex
 
 func startServer() {
 	addr, _ := net.ResolveTCPAddr("tcp", "127.0.0.1:8888")
-	conn, _ := net.ListenTCP("tcp", addr)
-	defer conn.Close()
+	listener, _ := net.ListenTCP("tcp", addr)
+	defer listener.Close()
 	fmt.Println("server start and waiting ...")
-	go closeListener(conn)
+	go closeListener(listener)
 	for {
-		conn, err := conn.AcceptTCP()
+		conn, err := listener.AcceptTCP()
 		if err != nil {
 			fmt.Println("AcceptTCP err", err)
 			break
